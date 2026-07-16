@@ -5,41 +5,48 @@ SELF ESTEEM
 • Sometimes confident → 2
 • Usually confident → 1
 • Always confident → 0
+
 2. How do you feel after a poor performance in sport or school?
 ◦ I feel worthless for days → 5 or 4 (based on the exact level)
 ◦ Very hard on myself → 3
 ◦ Upset but recover slowly → 2
 ◦ Recover after some time → 1
 ◦ Bounce back quickly → 0
+
 3. How often do you compare yourself negatively to teammates or classmates?
 ◦ All the time → 5 or 4 (based on the exact level)
 ◦ Often → 3
 ◦ Sometimes → 2
 ◦ Rarely → 1
 ◦ Never → 0
+
 4. How do you feel when you receive criticism from a coach or teacher?
 ◦ Devastated → 5 or 4 (based on the exact level)
 ◦ Very discouraged → 3
 ◦ Somewhat affected → 2
 ◦ I take it constructively → 1
 ◦ I welcome it → 0
+
 5. How often do you feel proud of your achievements?
 ◦ Never → 5 or 4 (based on the exact level)
 ◦ Rarely → 3
 ◦ Sometimes → 2
 ◦ Often → 1
 ◦ Always → 0
+
 6. How comfortable are you speaking up in a group — team meeting, class, or debate?
 ◦ Never speak up → 5 or 4 (based on the exact level)
 ◦ Only if forced → 3
 ◦ Sometimes → 2
 ◦ Usually comfortable → 1
 ◦ Very comfortable → 0
+
 MENTAL HEALTH HISTORY
 7. Do you have a history of diagnosed mental health conditions (e.g. anxiety disorder,
 depression, ADHD)?
 • Yes → 1
 • No → 0
+
 HEADACHES
 8.How often do you get headaches?
 • Daily=5
@@ -48,24 +55,29 @@ HEADACHES
 • Sometimes=2
 • Rarely=1
 • Never=0
+
 BLOOD PRESSURE
 9.Do you often feel your heart racing or pounding during non-physical situations (e.g. before
 an exam, during an argument)?
 • No → 0
 • Yes → 1
+
 10.Do you frequently experience headaches at the back of your head or neck?
 • No → 0
 • Yes → 1
+
 11.Have you ever been told by a doctor that your blood pressure is high, or do you regularly
 feel dizzy/lightheaded?
 • No → 0
 • Yes → 1
+
 SLEEP QUALITY
 12.How many hours of sleep do you typically get on a school night?
 • Less than 2 hours = 0
 • Less than 4 hours → 1
 • 4–5 hours → 2
 • 6–7 hours → 3
+
 • 8+ hours → 5 or 4 (based on the exact level)
 13.How often do you wake up feeling rested?
 • Never → 0
@@ -73,11 +85,13 @@ SLEEP QUALITY
 • Sometimes → 2
 • Often → 3
 • Always → 5
+
 14.How often does stress, training, or schoolwork keep you from falling asleep?
 • Every night → 0
 • Most nights → 1
 • Sometimes → 3
 • Rarely or never → 5
+
 BREATHING PROBLEMS
 15.How often do you experience shortness of breath outside of physical training?
 • Never → 0
@@ -85,6 +99,7 @@ BREATHING PROBLEMS
 • Sometimes → 2
 • Often → 3
 • Always → 4 or 5 (based on the exact level)
+
 16.Do you ever feel like you can't catch your breath during stressful situations (e.g. before an
 exam or competition)?
 • Never → 0
@@ -92,6 +107,7 @@ exam or competition)?
 • Sometimes → 2
 • Often → 4
 • Always → 5
+
 17.How often do you experience chest tightness or difficulty breathing when anxious or
 overwhelmed?
 • Never → 0
@@ -99,6 +115,7 @@ overwhelmed?
 • Sometimes → 2
 • Often → 4
 • Always → 5
+
 NOISE LEVEL
 18.How noisy is your study environment at home?
 • Extremely noisy, impossible to focus → 5 or 4 (based on the exact level)
@@ -106,18 +123,21 @@ NOISE LEVEL
 • Somewhat noisy → 2
 • Occasionally noisy → 1
 • Quiet → 0
+
 19.How often does noise around you interrupt your sleep?
 • Every night → 5 or 4 (based on the exact level)
 • Most nights → 3
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 20.How much does noise in your environment affect your concentration during study or rest?
 • Completely destroys my focus → 5 or 4 (based on the exact level)
 • Affects me a lot → 3
 • Affects me somewhat → 2
 • Slightly affects me → 1
 • Doesn't affect me → 0
+
 LIVING CONDITIONS
 21.How would you describe your home environment?
 • Very unstable/unsafe → 5 or 4 (based on the exact level)
@@ -125,18 +145,21 @@ LIVING CONDITIONS
 • Manageable → 2
 • Comfortable → 1
 • Very comfortable → 0
+
 22.Do you have a dedicated space to study and rest at home?
 • No space at all → 5 or 4 (based on the exact level)
 • Very limited space → 3
 • Shared but workable → 2
 • Mostly adequate → 1
 • Yes, fully adequate → 0
+
 23.How often do problems at home distract you from school or sport?
 • Always → 5 or 4 (based on the exact level)
 • Often → 3
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 SAFETY
 24.How safe do you feel in your school or training environment?
 • Very unsafe → 5 or 4 (based on the exact level)
@@ -144,12 +167,14 @@ SAFETY
 • Neutral → 2
 • Safe → 1
 • Very safe → 0
+
 25.How safe do you feel travelling to and from school or training?
 • Very unsafe → 5 or 4 (based on the exact level)
 • Unsafe → 3
 • Neutral → 2
 • Safe → 1
 • Very safe → 0
+
 26.How often do concerns about your physical safety affect your ability to focus on school or
 sport?
 • Always → 5 or 4 (based on the exact level)
@@ -157,6 +182,7 @@ sport?
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 BASIC NEEDS
 27.How often do you have access to enough food throughout the day?
 • Never → 5 or 4 (based on the exact level)
@@ -164,6 +190,7 @@ BASIC NEEDS
 • Sometimes → 2
 • Often → 1
 • Always → 0
+
 28.How often are you able to afford the supplies you need for school and sport (equipment,
 books, transport)?
 • Never → 5 or 4 (based on the exact level)
@@ -171,12 +198,14 @@ books, transport)?
 • Sometimes → 2
 • Often → 1
 • Always → 0
+
 29.How often does financial stress at home affect your ability to focus on school or sport?
 • Always → 5 or 4 (based on the exact level)
 • Often → 3
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 ACADEMIC PERFORMANCE
 30.How would you rate your current academic performance?
 • Very poor → 5 or 4 (based on the exact level)
@@ -184,18 +213,21 @@ ACADEMIC PERFORMANCE
 • Average → 2
 • Good → 1
 • Excellent → 0
+
 31.How often do you feel you are keeping up with your schoolwork?
 • Never → 5 or 4 (based on the exact level)
 • Rarely → 3
 • Sometimes → 2
 • Often → 1
 • Always → 0
+
 32.How often do your grades or academic results stress you out?
 • Always → 5 or 4 (based on the exact level)
 • Often → 3
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 STUDY LOAD
 33.How many hours per day do you spend studying outside of school?
 • More than 6 hours → 5 or 4 (based on the exact level)
@@ -203,18 +235,21 @@ STUDY LOAD
 • 2–4 hours → 2
 • 1–2 hours → 1
 • Less than 1 hour → 0
+
 34.How often do you feel overwhelmed by the amount of schoolwork you have?
 • Always → 5 or 4 (based on the exact level)
 • Often → 3
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 35.How often do you struggle to complete all your school assignments on time?
 • Always → 5 or 4 (based on the exact level)
 • Often → 3
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 TEACHER STUDENT RELATIONSHIP
 36.How supported do you feel by your teachers academically?
 • Not supported at all → 5 or 4 (based on the exact level)
@@ -222,18 +257,21 @@ TEACHER STUDENT RELATIONSHIP
 • Sometimes supported → 2
 • Usually supported → 1
 • Always supported → 0
+
 37.How comfortable are you approaching a teacher when you are struggling?
 • Never comfortable → 5 or 4 (based on the exact level)
 • Rarely comfortable → 3
 • Sometimes comfortable → 2
 • Usually comfortable → 1
 • Very comfortable → 0
+
 38.How often do interactions with teachers add to your stress rather than reduce it?
 • Always → 5 or 4 (based on the exact level)
 • Often → 3
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 FUTURE CAREER CONCERNS
 39.How often do you worry about your future career or life after school?
 • Always → 5 or 4 (based on the exact level)
@@ -241,28 +279,34 @@ FUTURE CAREER CONCERNS
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 40.How clear are you about what you want to do after school?
 • No idea at all → 5 or 4 (based on the exact level)
 • Very unclear → 3
 • Somewhat unclear → 2
 • Mostly clear → 1
 • Very clear → 0
+
 41.How often does uncertainty about your future affect your focus on school or sport?
 • Always → 5 or 4 (based on the exact level)
 • Often → 3
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 SOCIAL SUPPORT
 42.Do you have friends or family you can talk to when you are stressed?
 • No → 1
 • Yes → 0
+
 43.Do you feel your coach or teachers genuinely care about your wellbeing?
 • No → 1
 • Yes → 0
+
 44.When you are struggling, do you feel comfortable asking someone for help?
 • No → 1
 • Yes → 0
+
 PEER PRESSURE
 45.How often do you feel pressured by teammates or classmates to behave in a certain way?
 • Always → 5 or 4 (based on the exact level)
@@ -270,18 +314,21 @@ PEER PRESSURE
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 46.How often do you feel you have to change who you are to fit in with your peers?
 • Always → 5 or 4 (based on the exact level)
 • Often → 3
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 47.How often does pressure from peers affect your performance in sport or school?
 • Always → 5 or 4 
 • Often → 3
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 EXTRACURRICULAR ACTIVITIES
 48.How often do your extracurricular activities (sport, clubs, etc.) leave you feeling
 exhausted?
@@ -290,18 +337,21 @@ exhausted?
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 49.How often do your extracurricular commitments clash with your study time?
 • Always → 5 or 4 (based on the exact level)
 • Often → 3
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 50.How often do you feel overwhelmed by the number of activities you are involved in?
 • Always → 5 or 4 (based on the exact level)
 • Often → 3
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 BULLYING
 51.How often do you experience bullying or harassment from peers at school or in sport?
 • Always → 5 or 4 (based on the exact level)
@@ -309,12 +359,14 @@ BULLYING
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 52.How often do you witness bullying in your school or team environment?
 • Always → 5 or 4 (based on the exact level)
 • Often → 3
 • Sometimes → 2
 • Rarely → 1
 • Never → 0
+
 53.How often does bullying or negative treatment from others affect your confidence or
 performance?
 • Always → 5 or 4 (based on the exact level)
@@ -326,4 +378,21 @@ performance?
 
 
 #urls now
-Self ESTEEM
+1.Self ESTEEM
+https://www.youtube.com/watch?v=20hYOeGC7qc - how to build self esteem
+https://www.youtube.com/watch?v=MbF5dyU96CE - habits to improve self esteem
+https://www.youtube.com/watch?v=dB59FWfBfyI - Addressing Self-Hatred and Low Self Esteem
+
+2.HISTORY
+---(will find)
+
+3.HEADACHES
+https://www.youtube.com/watch?v=1hngJNQfb44 - tension headache exercises
+https://www.youtube.com/watch?v=Ofu66l71U9E - Tension Headaches | Triggers, Risk Factors, Signs & Symptoms, Types, Diagnosis, Treatment
+https://www.youtube.com/watch?v=9GedeI61i1c - tension headache relief
+
+4. blood pressure
+https://www.youtube.com/watch?v=8JDuBDIy4C4&t=26s What is High Blood Pressure? | New Hypertension Guidelines! 
+https://www.youtube.com/watch?v=cYGvBhla70U High Blood Pressure Explained: Causes, Dangers, and How to Lower High Blood Pressure
+
+5.
