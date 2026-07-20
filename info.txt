@@ -171,9 +171,9 @@ SAFETY
 25. How safe do you feel emotionally at school or with your team (expressing opinions, being yourself)?
 
 Very unsafe → 5 or 4 (based on the exact level)
-Unsafe → 4
-Neutral → 3
-Safe → 2 
+Unsafe → 3
+Neutral → 2
+Safe → 1
 Very safe → 0
 
 26.How often do concerns about your physical safety affect your ability to focus on school or
