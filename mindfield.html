@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MINDFIELD — Student Stress Assessment</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg:          #030308;
+    --surface:     rgba(15, 15, 26, 0.7);
+    --card:        rgba(22, 22, 38, 0.65);
+    --border:      rgba(255, 255, 255, 0.12);
+    --border-glow: rgba(0, 229, 255, 0.4);
+    --cyan:        #00e5ff;
+    --magenta:     #e040fb;
+    --gold:        #ffd740;
+    --coral:       #ff6e6e;
+    --green:       #69ff6e;
+    --text:        #f0f0f8;
+    --muted:       #8a8ab5;
+    --font-head:   'Space Grotesk', sans-serif;
+    --font-mono:   'Space Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-head);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  #space-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .canvas-bg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    overflow: hidden;
+  }
+  .blob {
+    position: absolute; border-radius: 50%;
+    filter: blur(120px); opacity: 0.22;
+    animation: cosmicDrift 22s ease-in-out infinite alternate;
+  }
+  .blob-1 { width:650px; height:650px; background:radial-gradient(circle, var(--cyan), transparent 70%); top:-150px; left:-150px; animation-delay:0s; }
+  .blob-2 { width:550px; height:550px; background:radial-gradient(circle, var(--magenta), transparent 70%); bottom:-120px; right:-120px; animation-delay:-7s; }
+  .blob-3 { width:450px; height:450px; background:radial-gradient(circle, var(--gold), transparent 70%); top:40%; left:65%; animation-delay:-14s; }
+  .blob-4 { width:350px; height:350px; background:radial-gradient(circle, #7c4dff, transparent 70%); top:15%; right:15%; animation-delay:-4s; }
+
+  @keyframes cosmicDrift {
+    0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+    50%  { transform: translate(50px, 35px) scale(1.1) rotate(180deg); }
+    100% { transform: translate(-30px, 50px) scale(0.95) rotate(360deg); }
+  }
+
+  .grid-lines {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      radial-gradient(circle at 50% 50%, rgba(0,229,255,0.08) 1px, transparent 1px),
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 80px 80px, 40px 40px, 40px 40px;
+    opacity: 0.7;
+  }
+
+  #app {
+    position: relative; z-index: 1;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  header {
+    padding: 56px 0 36px;
+    text-align: center;
+  }
+  .logo-tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--cyan);
+    background: rgba(0, 229, 255, 0.08);
+    border: 1px solid rgba(0,229,255,0.4);
+    box-shadow: 0 0 15px rgba(0,229,255,0.2), inset 0 0 10px rgba(0,229,255,0.1);
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+    animation: glowPulse 3s infinite alternate;
+  }
+  @keyframes glowPulse {
+    from { box-shadow: 0 0 10px rgba(0,229,255,0.2); }
+    to { box-shadow: 0 0 22px rgba(0,229,255,0.5), 0 0 8px rgba(224,64,251,0.3); }
+  }
+
+  h1 {
+    font-size: clamp(2.6rem, 8vw, 4.8rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #ffffff 0%, var(--cyan) 35%, var(--magenta) 75%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 40px rgba(0,229,255,0.3);
+  }
+  .subtitle {
+    margin-top: 18px;
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+  }
+
+  .progress-wrap { margin: 32px 0 12px; }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    letter-spacing: 0.05em;
+  }
+  .progress-track {
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--cyan), var(--magenta), var(--gold));
+    border-radius: 10px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 12px var(--cyan);
+  }
+
+  .cat-header {
+    margin: 40px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .cat-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    padding: 4px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+  }
+  .cat-name {
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .question-card {
+    background: var(--card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px 28px 26px;
+    margin-bottom: 22px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  }
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-a, var(--cyan)), var(--accent-b, var(--magenta)));
+    box-shadow: 0 0 12px var(--accent-a, var(--cyan));
+    opacity: 0.8;
+  }
+  .question-card:hover {
+    border-color: rgba(255,255,255,0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px 0 rgba(0, 229, 255, 0.08);
+  }
+  .q-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan);
+    margin-bottom: 12px;
+    letter-spacing: 0.1em;
+  }
+  .q-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.55;
+    color: var(--text);
+    margin-bottom: 22px;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .opt-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 18px;
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--muted);
+    font-family: var(--font-head);
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+  }
+  .opt-btn:hover {
+    border-color: var(--cyan);
+    color: var(--text);
+    background: rgba(0, 229, 255, 0.08);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+    transform: translateX(4px);
+  }
+  .opt-btn.selected {
+    border-color: var(--accent-a, var(--cyan));
+    background: rgba(0, 229, 255, 0.14);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.25), inset 0 0 10px rgba(0, 229, 255, 0.1);
+  }
+  .opt-dot {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.3);
+  }
+  .opt-btn:hover .opt-dot { border-color: var(--cyan); }
+  .opt-btn.selected .opt-dot {
+    border-color: var(--accent-a, var(--cyan));
+    background: var(--accent-a, var(--cyan));
+    box-shadow: 0 0 10px var(--accent-a, var(--cyan));
+  }
+  .opt-dot-inner {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #000;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .opt-btn.selected .opt-dot-inner { opacity: 1; }
+  .opt-label { flex: 1; }
+
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 36px;
+    gap: 16px;
+  }
+  .btn {
+    padding: 14px 32px;
+    border-radius: 30px;
+    font-family: var(--font-head);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    letter-spacing: 0.03em;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-ghost {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    backdrop-filter: blur(8px);
+  }
+  .btn-ghost:hover {
+    border-color: var(--text);
+    color: var(--text);
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 0 15px rgba(255,255,255,0.1);
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--cyan), var(--magenta));
+    color: #000;
+    font-weight: 700;
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 35px rgba(224, 64, 251, 0.6);
+  }
+  .btn-primary:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; animation: spaceFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+
+  @keyframes spaceFadeIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .intro-card {
+    background: var(--card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 52px 44px;
+    margin-top: 32px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  }
+  .intro-card::after {
+    content: '';
+    position: absolute;
+    width: 350px; height: 350px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,229,255,0.12), transparent 70%);
+    bottom: -120px; right: -100px;
+    pointer-events: none;
+  }
+  .intro-card h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    background: linear-gradient(90deg, #fff, var(--cyan), var(--magenta));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .intro-card p {
+    color: var(--muted);
+    line-height: 1.75;
+    margin-bottom: 16px;
+    font-size: 1rem;
+  }
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 32px 0;
+  }
+  .stat-box {
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s;
+  }
+  .stat-box:hover {
+    transform: translateY(-3px);
+    border-color: rgba(0,229,255,0.3);
+    box-shadow: 0 10px 25px rgba(0,229,255,0.1);
+  }
+  .stat-num {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--cyan);
+    text-shadow: 0 0 15px rgba(0,229,255,0.4);
+  }
+  .stat-lbl {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .disclaimer {
+    background: rgba(255, 215, 64, 0.05);
+    border: 1px solid rgba(255, 215, 64, 0.25);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 0.85rem;
+    color: rgba(255, 215, 64, 0.9);
+    line-height: 1.6;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 15px rgba(255, 215, 64, 0.05);
+  }
+
+  #loading-screen {
+    text-align: center;
+    padding: 100px 20px;
+  }
+  .orbit-spinner {
+    position: relative;
+    width: 80px; height: 80px;
+    margin: 0 auto 36px;
+  }
+  .orbit-ring {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    border: 2px solid transparent;
+  }
+  .orbit-ring:nth-child(1) {
+    border-top-color: var(--cyan);
+    border-bottom-color: var(--cyan);
+    animation: orbitSpin 1.4s linear infinite;
+    box-shadow: 0 0 15px rgba(0,229,255,0.5);
+  }
+  .orbit-ring:nth-child(2) {
+    inset: 10px;
+    border-left-color: var(--magenta);
+    border-right-color: var(--magenta);
+    animation: orbitSpin 1s linear infinite reverse;
+    box-shadow: 0 0 15px rgba(224,64,251,0.5);
+  }
+  .orbit-ring:nth-child(3) {
+    inset: 20px;
+    border-top-color: var(--gold);
+    animation: orbitSpin 2s linear infinite;
+  }
+  @keyframes orbitSpin { to { transform: rotate(360deg); } }
+
+  .loading-txt {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    animation: pulseGlow 1.8s ease-in-out infinite;
+  }
+  @keyframes pulseGlow {
+    0%,100%{ opacity:0.4; text-shadow: 0 0 0 transparent; }
+    50%{ opacity:1; color: var(--cyan); text-shadow: 0 0 12px var(--cyan); }
+  }
+
+  .result-hero {
+    background: var(--card);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 40px;
+    margin-top: 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  .result-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center top, var(--result-glow, rgba(0,229,255,0.12)), transparent 70%);
+    pointer-events: none;
+  }
+  .result-level-tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 6px 20px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    border: 1px solid;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  }
+  .result-level-num {
+    font-size: clamp(3.2rem, 11vw, 5.5rem);
+    font-weight: 700;
+    font-family: var(--font-mono);
+    line-height: 1;
+    margin-bottom: 12px;
+    text-shadow: 0 0 35px var(--result-color, var(--cyan));
+  }
+  .result-msg {
+    font-size: 1.05rem;
+    color: var(--text);
+    line-height: 1.8;
+    max-width: 600px;
+    margin: 0 auto;
+    letter-spacing: 0.01em;
+  }
+
+  .section-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin: 48px 0 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+
+  .tips-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media(max-width:600px) { .tips-grid { grid-template-columns: 1fr; } }
+  .tip-card {
+    background: var(--card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    transition: transform 0.3s;
+  }
+  .tip-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(0,229,255,0.3);
+  }
+  .tip-icon { font-size: 1.6rem; margin-bottom: 10px; }
+  .tip-title { font-size: 0.92rem; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+  .tip-body { font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+  .tip-links { display: flex; flex-direction: column; gap: 6px; }
+  .tip-link {
+    font-size: 0.78rem;
+    color: var(--cyan);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    word-break: break-all;
+  }
+  .tip-link:hover { opacity: 1; text-decoration: underline; }
+  .tip-link-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .chart-card {
+    background: var(--card);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 229, 255, 0.18);
+    border-radius: 14px;
+    padding: 20px 20px 8px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 24px rgba(124, 77, 255, 0.08), inset 0 0 40px rgba(0, 229, 255, 0.03);
+  }
+  .chart-bar-label {
+    font-family: var(--font-head);
+    font-size: 12px;
+    fill: var(--text);
+  }
+  .chart-value-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    fill: var(--muted);
+  }
+  .chart-gridline { stroke: rgba(255,255,255,0.08); stroke-width: 1; }
+  .chart-axis-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    fill: var(--muted);
+  }
+
+  .restart-wrap { text-align: center; margin-top: 48px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+  @media(max-width:600px) {
+    .intro-card { padding: 32px 24px; }
+    .stat-row { grid-template-columns: 1fr; }
+    .result-hero { padding: 32px 20px; }
+    .question-card { padding: 22px 20px; }
+    .stressor-bar-wrap { width: 80px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="space-canvas"></canvas>
+
+<div class="canvas-bg">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+</div>
+<div class="grid-lines"></div>
+
+<div id="app">
+  <header>
+    <div class="logo-tag">✦ MINDFIELD ✦</div>
+    <h1>MINDFIELD</h1>
+    <p class="subtitle">MINDFIELD measures your stress level and identifies exactly which parts of your life are driving it. 53 questions. Honest results.</p>
+  </header>
+
+  <!-- INTRO -->
+  <div id="intro-screen" class="screen active">
+    <div class="intro-card">
+      <h2>How are you really doing?</h2>
+      <p>MINDFIELD is a stress assessment for students. It measures stress across 18 areas of your life — from sleep and health to school, home, and social pressure — and tells you where the load is heaviest.</p>
+      <p>Your answers are run through a machine learning model trained on data from real-world stress research, which classifies your overall stress level and ranks the factors contributing to it.</p>
+      <p>Answer honestly. There are no wrong answers, and your data never leaves this page.</p>
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-num">53</div>
+          <div class="stat-lbl">Questions</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">18</div>
+          <div class="stat-lbl">Life Areas</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">~8</div>
+          <div class="stat-lbl">Minutes</div>
+        </div>
+      </div>
+      <div class="disclaimer">
+        ⚡ This is a screening tool, not a clinical diagnosis. If you're in distress, please speak to a trusted adult, school counsellor, or call a crisis helpline.
+      </div>
+    </div>
+    <div class="nav-row" style="justify-content:flex-end; margin-top:28px;">
+      <button class="btn btn-primary" onclick="startAssessment()">Start Assessment →</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen" class="screen">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span id="progress-label">Section 1 of 18</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div id="questions-container"></div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" id="btn-back" onclick="prevSection()">← Back</button>
+      <button class="btn btn-primary" id="btn-next" onclick="nextSection()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading-screen" class="screen">
+    <div class="orbit-spinner">
+      <div class="orbit-ring"></div>
+      <div class="orbit-ring"></div>
+      <div class="orbit-ring"></div>
+    </div>
+    <div class="loading-txt" id="loading-msg">ANALYSING COSMIC RESPONSES...</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results-screen" class="screen">
+    <div class="result-hero" id="result-hero">
+      <div class="result-level-tag" id="result-tag">—</div>
+      <div class="result-level-num" id="result-num">—</div>
+      <div class="result-level-name" id="result-name" style="display:none;">—</div>
+      <div class="result-msg" id="result-msg">—</div>
+    </div>
+
+    <div class="section-title">Your Top Stressors</div>
+    <div class="chart-card"><div id="stressor-chart"></div></div>
+
+    <div class="section-title">Recommended Actions</div>
+    <div class="tips-grid" id="tips-grid"></div>
+
+    <div class="restart-wrap">
+      <button class="btn btn-primary" onclick="downloadReport()">⬇ Download PDF Report</button>
+      <button class="btn btn-ghost" onclick="resetAssessment()">↺ Retake Assessment</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// ─── AUDIO SYNTHESIZER (LOUDER TURN SIGNAL SEQUENCE ON CLICK) ────────────────
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playTone(frequency, timeOffset, duration = 0.02) {
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(frequency * 1.5, audioCtx.currentTime + timeOffset);
+
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(frequency, audioCtx.currentTime + timeOffset);
+  osc.frequency.exponentialRampToValueAtTime(frequency * 0.2, audioCtx.currentTime + timeOffset + duration);
+
+  // Louder volume restored to 0.3
+  gain.gain.setValueAtTime(0.3, audioCtx.currentTime + timeOffset);
+  gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + timeOffset + duration);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start(audioCtx.currentTime + timeOffset);
+  osc.stop(audioCtx.currentTime + timeOffset + duration);
+}
+
+function playBothClickSounds() {
+  playTone(1200, 0, 0.025);     // First sound (High tick)
+  playTone(700, 0.05, 0.025);    // Second sound (Low tick)
+}
+
+// ─── SPACE CANVAS ─────────────────────────────────────────────────────────────
+(function initSpaceCanvas() {
+  const canvas = document.getElementById('space-canvas');
+  const ctx = canvas.getContext('2d');
+  let width, height, particles = [];
+  let mouse = { x: null, y: null, radius: 150 };
+
+  function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resize);
+  resize();
+  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  window.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+
+  class Particle {
+    constructor() { this.reset(); }
+    reset() {
+      this.x = Math.random() * width; this.y = Math.random() * height;
+      this.size = Math.random() * 2.2 + 0.4;
+      this.baseAlpha = Math.random() * 0.7 + 0.2; this.alpha = this.baseAlpha;
+      this.vx = (Math.random() - 0.5) * 0.35; this.vy = (Math.random() - 0.5) * 0.35;
+      this.twinkleSpeed = Math.random() * 0.02 + 0.005;
+      this.twinkleDir = Math.random() > 0.5 ? 1 : -1;
+      const colors = ['#00e5ff', '#e040fb', '#ffd740', '#ffffff', '#7c4dff'];
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+      this.isGlowing = Math.random() < 0.25;
+    }
+    update() {
+      this.x += this.vx; this.y += this.vy;
+      if (this.x < 0) this.x = width; if (this.x > width) this.x = 0;
+      if (this.y < 0) this.y = height; if (this.y > height) this.y = 0;
+      this.alpha += this.twinkleSpeed * this.twinkleDir;
+      if (this.alpha > 0.95 || this.alpha < 0.15) this.twinkleDir *= -1;
+      if (mouse.x !== null) {
+        const dx = mouse.x - this.x, dy = mouse.y - this.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < mouse.radius) {
+          const f = (mouse.radius - dist) / mouse.radius;
+          this.x -= (dx/dist) * f * 1.8; this.y -= (dy/dist) * f * 1.8;
+        }
+      }
+    }
+    draw() {
+      ctx.save(); ctx.globalAlpha = Math.max(0, Math.min(1, this.alpha));
+      ctx.fillStyle = this.color;
+      if (this.isGlowing) { ctx.shadowBlur = this.size * 6; ctx.shadowColor = this.color; }
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); ctx.restore();
+    }
+  }
+
+  const count = Math.floor((window.innerWidth * window.innerHeight) / 9000);
+  for (let i = 0; i < count; i++) particles.push(new Particle());
+
+  function drawConstellations() {
+    const maxDist = 110;
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i+1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < maxDist) {
+          ctx.save(); ctx.globalAlpha = (1 - dist/maxDist) * 0.12;
+          ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 0.6;
+          ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke(); ctx.restore();
+        }
+      }
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+    drawConstellations();
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+// ─── QUESTION DATA ────────────────────────────────────────────────────────────
+const CATEGORIES = [
+  {
+    id: 'SE', name: 'Self Esteem', idx: 0, type: 'sum', accent: ['#00e5ff','#40c4ff'],
+    questions: [
+      { text: 'How confident do you feel in your abilities as a student-athlete?',
+        opts: [{l:'Not confident at all',v:5},{l:'Rarely confident',v:4},{l:'Sometimes confident',v:3},{l:'Usually confident',v:1},{l:'Always confident',v:0}] },
+      { text: 'How do you feel after a poor performance in sport or school?',
+        opts: [{l:'I feel worthless for days',v:5},{l:'Very hard on myself',v:4},{l:'Upset but recover slowly',v:3},{l:'Recover after some time',v:1},{l:'Bounce back quickly',v:0}] },
+      { text: 'How often do you compare yourself negatively to teammates or classmates?',
+        opts: [{l:'All the time',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+      { text: 'How do you feel when you receive criticism from a coach or teacher?',
+        opts: [{l:'Devastated',v:5},{l:'Very discouraged',v:4},{l:'Somewhat affected',v:3},{l:'I take it constructively',v:1},{l:'I welcome it',v:0}] },
+      { text: 'How often do you feel proud of your achievements?',
+        opts: [{l:'Never',v:5},{l:'Rarely',v:4},{l:'Sometimes',v:3},{l:'Often',v:1},{l:'Always',v:0}] },
+      { text: 'How comfortable are you speaking up in a group — team meeting, class, or debate?',
+        opts: [{l:'Never speak up',v:5},{l:'Only if forced',v:4},{l:'Sometimes',v:3},{l:'Usually comfortable',v:1},{l:'Very comfortable',v:0}] },
+    ]
+  },
+  {
+    id: 'MHH', name: 'Mental Health History', idx: 1, type: 'single', accent: ['#e040fb','#ce93d8'],
+    questions: [
+      { text: 'Do you have a history of diagnosed mental health conditions (e.g. anxiety disorder, depression, ADHD)?',
+        opts: [{l:'Yes',v:1},{l:'No',v:0}] },
+    ]
+  },
+  {
+    id: 'HEAD', name: 'Headaches', idx: 2, type: 'single', accent: ['#ff6e6e','#ff8a80'],
+    questions: [
+      { text: 'How often do you get headaches?',
+        opts: [{l:'Daily',v:5},{l:'Very Often',v:4},{l:'Often',v:3},{l:'Sometimes',v:2},{l:'Rarely',v:1},{l:'Never',v:0}] },
+    ]
+  },
+  {
+    id: 'BP', name: 'Blood Pressure', idx: 3, type: 'avg', accent: ['#ff6e6e','#e040fb'],
+    questions: [
+      { text: 'Do you often feel your heart racing or pounding during non-physical situations (e.g. before an exam, during an argument)?',
+        opts: [{l:'No',v:0},{l:'Yes',v:1}] },
+      { text: 'Do you frequently experience headaches at the back of your head or neck?',
+        opts: [{l:'No',v:0},{l:'Yes',v:1}] },
+      { text: 'Have you ever been told by a doctor that your blood pressure is high, or do you regularly feel dizzy/lightheaded?',
+        opts: [{l:'No',v:0},{l:'Yes',v:1}] },
+    ]
+  },
+  {
+    id: 'SQ', name: 'Sleep Quality', idx: 4, type: 'avg', accent: ['#7c4dff','#9c64e0'],
+    questions: [
+      { text: 'How many hours of sleep do you typically get on a school night?',
+        opts: [{l:'Less than 2 hours',v:5},{l:'Less than 4 hours',v:4},{l:'4–5 hours',v:3},{l:'5–6 hours',v:1},{l:'8+ hours',v:0}] },
+      { text: 'How often do you wake up feeling rested?',
+        opts: [{l:'Never',v:5},{l:'Rarely',v:4},{l:'Sometimes',v:3},{l:'Often',v:1},{l:'Always',v:0}] },
+      { text: 'How often does stress, training, or schoolwork keep you from falling asleep?',
+        opts: [{l:'Every night',v:5},{l:'Most nights',v:4},{l:'Sometimes',v:3},{l:'Rarely or never',v:1}] },
+    ]
+  },
+  {
+    id: 'BREATH', name: 'Breathing Problems', idx: 5, type: 'avg', accent: ['#00bcd4','#00e5ff'],
+    questions: [
+      { text: 'How often do you experience shortness of breath outside of physical training?',
+        opts: [{l:'Never',v:0},{l:'Rarely',v:1},{l:'Sometimes',v:2},{l:'Often',v:3},{l:'Always',v:5}] },
+      { text: "Do you ever feel like you can't catch your breath during stressful situations (e.g. before an exam or competition)?",
+        opts: [{l:'Never',v:0},{l:'Rarely',v:1},{l:'Sometimes',v:2},{l:'Often',v:4},{l:'Always',v:5}] },
+      { text: 'How often do you experience chest tightness or difficulty breathing when anxious or overwhelmed?',
+        opts: [{l:'Never',v:0},{l:'Rarely',v:1},{l:'Sometimes',v:2},{l:'Often',v:4},{l:'Always',v:5}] },
+    ]
+  },
+  {
+    id: 'NL', name: 'Noise Level', idx: 6, type: 'avg', accent: ['#ffd740','#ffab40'],
+    questions: [
+      { text: 'How noisy is your study environment at home?',
+        opts: [{l:'Extremely noisy, impossible to focus',v:5},{l:'Very noisy',v:4},{l:'Somewhat noisy',v:3},{l:'Occasionally noisy',v:2},{l:'Quiet',v:0}] },
+      { text: 'How often does noise around you interrupt your sleep?',
+        opts: [{l:'Every night',v:5},{l:'Most nights',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+      { text: 'How much does noise in your environment affect your concentration during study or rest?',
+        opts: [{l:'Completely destroys my focus',v:5},{l:'Affects me a lot',v:4},{l:'Affects me somewhat',v:3},{l:'Slightly affects me',v:1},{l:"Doesn't affect me",v:0}] },
+    ]
+  },
+  {
+    id: 'LC', name: 'Living Conditions', idx: 7, type: 'avg', accent: ['#69ff6e','#40e0d0'],
+    questions: [
+      { text: 'How would you describe your home environment?',
+        opts: [{l:'Very unstable/unsafe',v:5},{l:'Unstable',v:4},{l:'Manageable',v:3},{l:'Comfortable',v:1},{l:'Very comfortable',v:0}] },
+      { text: 'Do you have a dedicated space to study and rest at home?',
+        opts: [{l:'No space at all',v:5},{l:'Very limited space',v:4},{l:'Shared but workable',v:3},{l:'Mostly adequate',v:1},{l:'Yes, fully adequate',v:0}] },
+      { text: 'How often do problems at home distract you from school or sport?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+    ]
+  },
+  {
+    id: 'SAF', name: 'Safety', idx: 8, type: 'avg', accent: ['#ff6e6e','#ffd740'],
+    questions: [
+      { text: 'How safe do you feel in your school or training environment?',
+        opts: [{l:'Very unsafe',v:5},{l:'Unsafe',v:4},{l:'Neutral',v:3},{l:'Safe',v:1},{l:'Very safe',v:0}] },
+      { text: 'How safe do you feel emotionally at school or with your team (expressing opinions, being yourself)?',
+        opts: [{l:'Very unsafe',v:5},{l:'Unsafe',v:4},{l:'Neutral',v:3},{l:'Safe',v:1},{l:'Very safe',v:0}] },
+      { text: 'How often do concerns about your physical safety affect your ability to focus on school or sport?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+    ]
+  },
+  {
+    id: 'BN', name: 'Basic Needs', idx: 9, type: 'avg', accent: ['#e040fb','#ffd740'],
+    questions: [
+      { text: 'How often do you have access to enough food throughout the day?',
+        opts: [{l:'Never',v:5},{l:'Rarely',v:4},{l:'Sometimes',v:3},{l:'Often',v:1},{l:'Always',v:0}] },
+      { text: 'How often are you able to afford the supplies you need for school and sport (equipment, books, transport)?',
+        opts: [{l:'Never',v:5},{l:'Rarely',v:4},{l:'Sometimes',v:3},{l:'Often',v:1},{l:'Always',v:0}] },
+      { text: 'How often does financial stress at home affect your ability to focus on school or sport?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+    ]
+  },
+  {
+    id: 'AP', name: 'Academic Performance', idx: 10, type: 'avg', accent: ['#00e5ff','#69ff6e'],
+    questions: [
+      { text: 'How would you rate your current academic performance?',
+        opts: [{l:'Very poor',v:5},{l:'Poor',v:4},{l:'Average',v:3},{l:'Good',v:1},{l:'Excellent',v:0}] },
+      { text: 'How often do you feel you are keeping up with your schoolwork?',
+        opts: [{l:'Never',v:5},{l:'Rarely',v:4},{l:'Sometimes',v:3},{l:'Often',v:1},{l:'Always',v:0}] },
+      { text: 'How often do your grades or academic results stress you out?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+    ]
+  },
+  {
+    id: 'SL', name: 'Study Load', idx: 11, type: 'avg', accent: ['#e040fb','#00e5ff'],
+    questions: [
+      { text: 'How many hours per day do you spend studying outside of school?',
+        opts: [{l:'More than 6 hours',v:5},{l:'4–6 hours',v:4},{l:'2–4 hours',v:3},{l:'1–2 hours',v:1},{l:'Less than 1 hour',v:0}] },
+      { text: 'How often do you feel overwhelmed by the amount of schoolwork you have?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+      { text: 'How often do you struggle to complete all your school assignments on time?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+    ]
+  },
+  {
+    id: 'TSR', name: 'Teacher–Student Relationship', idx: 12, type: 'avg', accent: ['#ffd740','#ff6e6e'],
+    questions: [
+      { text: 'How supported do you feel by your teachers academically?',
+        opts: [{l:'Not supported at all',v:5},{l:'Rarely supported',v:4},{l:'Sometimes supported',v:3},{l:'Usually supported',v:1},{l:'Always supported',v:0}] },
+      { text: 'How comfortable are you approaching a teacher when you are struggling?',
+        opts: [{l:'Never comfortable',v:5},{l:'Rarely comfortable',v:4},{l:'Sometimes comfortable',v:3},{l:'Usually comfortable',v:1},{l:'Very comfortable',v:0}] },
+      { text: 'How often do interactions with teachers add to your stress rather than reduce it?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+    ]
+  },
+  {
+    id: 'FCC', name: 'Future Career Concerns', idx: 13, type: 'avg', accent: ['#69ff6e','#00e5ff'],
+    questions: [
+      { text: 'How often do you worry about your future career or life after school?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+      { text: 'How clear are you about what you want to do after school?',
+        opts: [{l:'No idea at all',v:5},{l:'Very unclear',v:4},{l:'Somewhat unclear',v:3},{l:'Mostly clear',v:1},{l:'Very clear',v:0}] },
+      { text: 'How often does uncertainty about your future affect your focus on school or sport?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+    ]
+  },
+  {
+    id: 'SS', name: 'Social Support', idx: 14, type: 'avg01', accent: ['#e040fb','#69ff6e'],
+    questions: [
+      { text: 'Do you have friends or family you can talk to when you are stressed?',
+        opts: [{l:'No',v:1},{l:'Yes',v:0}] },
+      { text: 'Do you feel your coach or teachers genuinely care about your wellbeing?',
+        opts: [{l:'No',v:1},{l:'Yes',v:0}] },
+      { text: 'When you are struggling, do you feel comfortable asking someone for help?',
+        opts: [{l:'No',v:1},{l:'Yes',v:0}] },
+    ]
+  },
+  {
+    id: 'PP', name: 'Peer Pressure', idx: 15, type: 'avg', accent: ['#ff6e6e','#ffd740'],
+    questions: [
+      { text: 'How often do you feel pressured by teammates or classmates to behave in a certain way?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+      { text: 'How often do you feel you have to change who you are to fit in with your peers?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+      { text: 'How often does pressure from peers affect your performance in sport or school?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+    ]
+  },
+  {
+    id: 'EA', name: 'Extracurricular Activities', idx: 16, type: 'avg', accent: ['#00e5ff','#e040fb'],
+    questions: [
+      { text: 'How often do your extracurricular activities (sport, clubs, etc.) leave you feeling exhausted?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+      { text: 'How often do your extracurricular commitments clash with your study time?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+      { text: 'How often do you feel overwhelmed by the number of activities you are involved in?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+    ]
+  },
+  {
+    id: 'BULL', name: 'Bullying', idx: 17, type: 'avg', accent: ['#ff6e6e','#e040fb'],
+    questions: [
+      { text: 'How often do you experience bullying or harassment from peers at school or in sport?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+      { text: 'How often do you witness bullying in your school or team environment?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+      { text: 'How often does bullying or negative treatment from others affect your confidence or performance?',
+        opts: [{l:'Always',v:5},{l:'Often',v:4},{l:'Sometimes',v:3},{l:'Rarely',v:1},{l:'Never',v:0}] },
+    ]
+  },
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let currentSection = 0;
+let answers = {};
+let lastResult = null;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startAssessment() {
+  answers = {}; currentSection = 0;
+  renderSection(); showScreen('quiz-screen');
+}
+
+function renderSection() {
+  const cat = CATEGORIES[currentSection];
+  const container = document.getElementById('questions-container');
+  const pct = Math.round((currentSection / CATEGORIES.length) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `Section ${currentSection+1} of ${CATEGORIES.length}`;
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('btn-back').style.visibility = currentSection === 0 ? 'hidden' : 'visible';
+  const isLast = currentSection === CATEGORIES.length - 1;
+  document.getElementById('btn-next').textContent = isLast ? 'See My Results →' : 'Continue →';
+
+  let html = `
+    <div class="cat-header">
+      <span class="cat-badge" style="background:rgba(${hexToRgb(cat.accent[0])},0.15);color:${cat.accent[0]};border:1px solid ${cat.accent[0]}60;box-shadow:0 0 12px rgba(${hexToRgb(cat.accent[0])},0.3);">${currentSection+1}</span>
+      <span class="cat-name">${cat.name}</span>
+    </div>
+  `;
+
+  cat.questions.forEach((q, qi) => {
+    const selected = answers[`${cat.idx}-${qi}`] ?? null;
+    html += `<div class="question-card" style="--accent-a:${cat.accent[0]};--accent-b:${cat.accent[1]};">
+      <div class="q-num">✦ QUESTION ${getGlobalQNum(currentSection, qi)}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="options">`;
+    q.opts.forEach((opt, oi) => {
+      const isSel = selected !== null && selected.optIdx === oi;
+      html += `<button class="opt-btn${isSel?' selected':''}" 
+        onclick="selectAnswer(${currentSection},${qi},${oi},${opt.v})" 
+        style="${isSel?`--accent-a:${cat.accent[0]};`:''}">
+        <span class="opt-dot"><span class="opt-dot-inner"></span></span>
+        <span class="opt-label">${opt.l}</span>
+      </button>`;
+    });
+    html += `</div></div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function getGlobalQNum(secIdx, qIdx) {
+  let n = 1;
+  for (let i = 0; i < secIdx; i++) n += CATEGORIES[i].questions.length;
+  return n + qIdx;
+}
+
+function selectAnswer(catIdx, qIdx, optIdx, value) {
+  playBothClickSounds(); // Plays both tone sequence on option click
+  answers[`${catIdx}-${qIdx}`] = { optIdx, value };
+  renderSection();
+}
+
+function sectionComplete() {
+  const cat = CATEGORIES[currentSection];
+  for (let qi = 0; qi < cat.questions.length; qi++) {
+    if (answers[`${currentSection}-${qi}`] === undefined) return false;
+  }
+  return true;
+}
+
+function nextSection() {
+  if (!sectionComplete()) { alert('Please answer all questions in this section before continuing.'); return; }
+  if (currentSection < CATEGORIES.length - 1) {
+    currentSection++; renderSection(); window.scrollTo(0,0);
+  } else { computeAndShow(); }
+}
+
+function prevSection() {
+  if (currentSection > 0) { currentSection--; renderSection(); window.scrollTo(0,0); }
+}
+
+// ─── SCORING ──────────────────────────────────────────────────────────────────
+function computeScores() {
+  const xhat = new Array(18).fill(0);
+  CATEGORIES.forEach((cat, ci) => {
+    const vals = cat.questions.map((_, qi) => answers[`${ci}-${qi}`]?.value ?? 0);
+    xhat[cat.idx] = cat.type === 'sum'
+      ? vals.reduce((a,b) => a+b, 0)
+      : vals.reduce((a,b) => a+b, 0) / vals.length;
+  });
+  return xhat;
+}
+
+function bubbleSort(scores, cats) {
+  const arr = scores.map((s, i) => ({
+    score: s,
+    norm: i === 0 ? s / 30 : s / 5,   // SE is 0-30, all others 0-5
+    name: cats[i].name,
+    catIdx: i
+  }));
+
+  let last = arr.length - 1;
+  while (true) {
+    let swapped = false;
+    for (let i = 0; i < last; i++) {
+      if (arr[i].norm < arr[i+1].norm) {
+        [arr[i], arr[i+1]] = [arr[i+1], arr[i]];
+        swapped = true;
+      }
+    }
+    if (!swapped) break;
+    last--;
+  }
+  return arr;
+}
+
+// ─── FLASK API + RESULTS ──────────────────────────────────────────────────────
+const FLASK_API_URL = '/predict';
+
+async function computeAndShow() {
+  showScreen('loading-screen');
+  const xhat = computeScores();
+  const sortedStressors = bubbleSort(xhat, CATEGORIES);
+
+  const msgs = ['ANALYSING COSMIC RESPONSES...','MAPPING STRESS CONSTELLATIONS...','RUNNING QUANTUM ASSESSMENT MODEL...','PREPARING YOUR ORBITAL RESULTS...'];
+  let mi = 0;
+  const ticker = setInterval(() => { mi = (mi+1)%msgs.length; document.getElementById('loading-msg').textContent = msgs[mi]; }, 1500);
+
+  let level = 1; // default fallback
+  try {
+    const response = await fetch(FLASK_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ xhat })
+    });
+    if (!response.ok) throw new Error('API error');
+    const data = await response.json();
+    level = data.level;
+  } catch (err) {
+    const xhat_norm = xhat.map((v, i) => i === 0 ? v/30 : v/5);
+    const avg = xhat_norm.reduce((a,b) => a+b, 0) / xhat_norm.length;
+    level = avg < 0.3 ? 0 : avg < 0.6 ? 1 : 2;
+  }
+
+  clearInterval(ticker);
+
+  const f = [0,1,2,3].map(i => sortedStressors[i].name.toLowerCase());
+  const fallbackMessages = [
+    `Your overall stress load is reading low right now, which means your day-to-day systems — sleep, routine, support — are largely holding up under the pressure of balancing sport and school. That said, ${f[0]}, ${f[1]}, ${f[2]}, and ${f[3]} came out as your biggest contributors, and low doesn't mean zero. Stress tends to creep up quietly before it becomes obvious, so this is actually the best time to build habits rather than fix problems. Pick one of the areas above and put a small, repeatable action against it this week — a fixed bedtime, a five-minute check-in with a coach or friend, or a short planning session on Sunday nights. The goal isn't to eliminate stress; it's to keep your baseline strong enough that the inevitable high-pressure weeks — exams, competitions, deadlines — don't knock you off balance. You're in a good position. Use it.`,
+    `You're carrying a moderate stress load — noticeable, but not yet at a level that should feel unmanageable if you get ahead of it. The categories pulling the hardest right now are ${f[0]}, ${f[1]}, ${f[2]}, and ${f[3]}, and it's worth sitting with that for a second rather than rushing past it. Moderate stress is often the stage where small interventions have the biggest payoff, because the systems around you haven't broken down yet — they're just strained. Look at the top-ranked stressor first: is it something you can reduce (dropping a low-value commitment), reframe (changing how you measure success), or get support for (talking to a coach, teacher, or trusted adult)? You don't need to solve everything this week. Pick the one lever that would relieve the most pressure and pull it. Acknowledging where you're at is the first real step — what you do with the next few weeks is what determines whether this stays manageable or starts to climb.`,
+    `Your stress level is coming back high, and the categories driving that most strongly are ${f[0]}, ${f[1]}, ${f[2]}, and ${f[3]}. This isn't a verdict on you or your ability to handle pressure — it's a signal that the current load, across school, sport, and life outside both, has genuinely outpaced your current support and recovery systems. That combination is hard to carry alone, and it isn't meant to be carried alone. Please talk to someone you trust this week — a coach, a teacher, a school counsellor, a parent, or a friend — and be specific about what's weighing on you rather than just saying "I'm fine." If any of the areas above involve your safety, your access to food, sleep, or a stable home environment, treat those as the priority; everything else can wait until those are addressed. Small, consistent support — even a five-minute conversation — tends to matter more right now than any single productivity fix. You don't have to have this figured out on your own.`
+  ];
+
+  showResults(level, fallbackMessages[level], sortedStressors, xhat);
+}
+
+function showResults(level, message, sortedStressors, xhat) {
+  const configs = {
+    0: { label: 'STRESS LEVEL', name: 'LOW', color: '#69ff6e', glow: 'rgba(105,255,110,0.18)' },
+    1: { label: 'STRESS LEVEL', name: 'MODERATE', color: '#ffd740', glow: 'rgba(255,215,64,0.18)' },
+    2: { label: 'STRESS LEVEL', name: 'HIGH', color: '#ff6e6e', glow: 'rgba(255,110,110,0.22)' },
+  };
+  const cfg = configs[level] || configs[1];
+
+  const hero = document.getElementById('result-hero');
+  hero.style.setProperty('--result-glow', cfg.glow);
+  hero.style.setProperty('--result-color', cfg.color);
+
+  const tag = document.getElementById('result-tag');
+  tag.textContent = cfg.label;
+  tag.style.color = cfg.color;
+  tag.style.borderColor = cfg.color + '80';
+  tag.style.background = cfg.color + '15';
+  tag.style.boxShadow = `0 0 15px ${cfg.color}30`;
+
+  document.getElementById('result-num').textContent = cfg.name;
+  document.getElementById('result-num').style.color = cfg.color;
+  document.getElementById('result-name').style.display = 'none';
+  document.getElementById('result-msg').textContent = message;
+
+  lastResult = { level, cfgName: cfg.name, message, sortedStressors };
+
+  document.getElementById('stressor-chart').innerHTML = renderStressorChart(sortedStressors.slice(0, 7));
+
+  const tips = getTips(sortedStressors.slice(0, 4).map(s => s.catIdx));
+  document.getElementById('tips-grid').innerHTML = tips.map(t => `
+    <div class="tip-card">
+      <div class="tip-icon">${t.icon}</div>
+      <div class="tip-title">${t.title}</div>
+      <div class="tip-body">${t.body}</div>
+      <div class="tip-links">
+        ${t.links.map(lk => `
+          <span class="tip-link-label">▶ ${lk.label}</span>
+          <a class="tip-link" href="${lk.url}" target="_blank" rel="noopener noreferrer">${lk.url}</a>
+        `).join('')}
+      </div>
+    </div>`).join('');
+
+  showScreen('results-screen');
+}
+
+// ─── BAR CHART (TOP STRESSORS) ─────────────────────────────────────────────
+function renderStressorChart(items) {
+  const w = 820, rowH = 42, padLeft = 190, padRight = 60, padTop = 16, padBottom = 16;
+  const h = padTop + padBottom + rowH * items.length;
+  const chartW = w - padLeft - padRight;
+  const max = Math.max(...items.map(s => s.norm), 0.01);
+
+  // cosmic neon gradient pairs, cycling per rank — coral/magenta, gold/coral, cyan/violet
+  const gradPairs = [
+    ['#ff6e6e', '#e040fb'],
+    ['#ffd740', '#ff6e6e'],
+    ['#00e5ff', '#7c4dff'],
+    ['#e040fb', '#00e5ff'],
+  ];
+
+  const defs = `<defs>
+    ${items.map((_, i) => {
+      const [c1, c2] = gradPairs[i % gradPairs.length];
+      return `<linearGradient id="barGrad${i}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="${c1}"/>
+        <stop offset="100%" stop-color="${c2}"/>
+      </linearGradient>`;
+    }).join('')}
+    <radialGradient id="chartAmbient" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#7c4dff" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="barGlow" x="-60%" y="-200%" width="220%" height="500%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>`;
+
+  const ambient = `<rect x="0" y="0" width="${w}" height="${h}" fill="url(#chartAmbient)"/>`;
+
+  const gridlines = [0, 0.25, 0.5, 0.75, 1].map(f => {
+    const x = padLeft + chartW * f;
+    return `<line class="chart-gridline" x1="${x}" y1="${padTop - 4}" x2="${x}" y2="${h - padBottom + 4}"/>
+      <text class="chart-axis-label" x="${x}" y="${h - 2}" text-anchor="middle">${f.toFixed(2)}</text>`;
+  }).join('');
+
+  const bars = items.map((s, i) => {
+    const y = padTop + i * rowH;
+    const barH = rowH - 14;
+    const barW = Math.max((s.norm / max) * chartW, 2);
+    const grad = `url(#barGrad${i % gradPairs.length})`;
+    const glowColor = gradPairs[i % gradPairs.length][0];
+    const label = s.name.length > 26 ? s.name.slice(0, 24) + '…' : s.name;
+    return `
+      <text class="chart-bar-label" x="${padLeft - 12}" y="${y + barH / 2 + 4}" text-anchor="end">${label}</text>
+      <rect x="${padLeft}" y="${y}" width="${chartW}" height="${barH}" rx="6" fill="rgba(255,255,255,0.03)"/>
+      <rect x="${padLeft}" y="${y}" width="${barW}" height="${barH}" rx="6" fill="${grad}" filter="url(#barGlow)" opacity="0.95">
+        <animate attributeName="width" from="0" to="${barW}" dur="0.8s" fill="freeze" calcMode="spline" keySplines="0.16 1 0.3 1"/>
+      </rect>
+      <circle cx="${padLeft + barW}" cy="${y + barH / 2}" r="3" fill="${glowColor}" opacity="0.9"/>
+      <text class="chart-value-label" x="${padLeft + barW + 10}" y="${y + barH / 2 + 4}">${s.norm.toFixed(2)}</text>`;
+  }).join('');
+
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;">${defs}${ambient}${gridlines}${bars}</svg>`;
+}
+
+// ─── PDF REPORT DOWNLOAD ────────────────────────────────────────────────────
+function downloadReport() {
+  if (!lastResult || typeof window.jspdf === 'undefined') return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const marginX = 48;
+  let y = 60;
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(20);
+  doc.text('MINDFIELD — Stress Assessment Report', marginX, y);
+  y += 20;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+  doc.setTextColor(120);
+  doc.text(new Date().toLocaleDateString(), marginX, y);
+  doc.setTextColor(0);
+  y += 30;
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
+  doc.text(`Stress Level: ${lastResult.cfgName}`, marginX, y);
+  y += 22;
+
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+  const msgLines = doc.splitTextToSize(lastResult.message, 500);
+  doc.text(msgLines, marginX, y);
+  y += msgLines.length * 14 + 20;
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+  doc.text('Top Stressors', marginX, y);
+  y += 18;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+  lastResult.sortedStressors.slice(0, 7).forEach((s, i) => {
+    if (y > 760) { doc.addPage(); y = 60; }
+    doc.text(`${i + 1}. ${s.name}  —  ${s.norm.toFixed(2)}`, marginX, y);
+    y += 16;
+  });
+
+  y += 16;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+  doc.setTextColor(140);
+  const disclaimerLines = doc.splitTextToSize(
+    'This is a screening tool, not a clinical diagnosis. If you are in distress, please speak to a trusted adult, school counsellor, or call a crisis helpline.',
+    500
+  );
+  doc.text(disclaimerLines, marginX, y);
+
+  doc.save('mindfield-stress-report.pdf');
+}
+
+// ─── TIPS + YOUTUBE LINKS ──────────────────────────────────────────────────
+function getTips(topCatIndices) {
+  const allTips = {
+    0: {
+      icon: '🪞', title: 'Build Your Self-Image',
+      body: 'Log one thing you did well each day — in sport or school. Your brain needs evidence, not pep talks.',
+      links: [
+        { label: 'How to build self esteem', url: 'https://www.youtube.com/watch?v=20hYOeGC7qc' },
+        { label: 'Habits to improve self esteem', url: 'https://www.youtube.com/watch?v=MbF5dyU96CE' },
+        { label: 'Addressing self-hatred and low self esteem', url: 'https://www.youtube.com/watch?v=dB59FWfBfyI' },
+      ]
+    },
+    1: {
+      icon: '🧠', title: 'Mental Health Check-In',
+      body: 'History of mental health challenges means stress hits harder. Flag this to your coach or school counsellor — it changes how support should look.',
+      links: [
+        { label: 'Building internal sense of safety from trauma', url: 'https://www.youtube.com/watch?v=ih2dUfxa4As&t=31s' },
+      ]
+    },
+    2: {
+      icon: '💧', title: 'Hydration & Headaches',
+      body: 'Dehydration triggers headaches in athletes. Keep water on you during training and study sessions.',
+      links: [
+        { label: 'Tension headache exercises', url: 'https://www.youtube.com/watch?v=1hngJNQfb44' },
+        { label: 'Tension headaches — triggers, symptoms, treatment', url: 'https://www.youtube.com/watch?v=Ofu66l71U9E' },
+        { label: 'Tension headache relief', url: 'https://www.youtube.com/watch?v=9GedeI61i1c' },
+      ]
+    },
+    3: {
+      icon: '❤️', title: 'Regulate Your Nervous System',
+      body: 'Box breathing (4-4-4-4 counts) before high-pressure situations can slow a racing heart within minutes.',
+      links: [
+        { label: 'What is high blood pressure? New hypertension guidelines', url: 'https://www.youtube.com/watch?v=8JDuBDIy4C4&t=26s' },
+        { label: 'High blood pressure explained: causes, dangers, how to lower it', url: 'https://www.youtube.com/watch?v=cYGvBhla70U' },
+      ]
+    },
+    4: {
+      icon: '😴', title: 'Guard Your Sleep',
+      body: 'Set a firm lights-out time 3 nights a week to start. Even one good night shifts recovery and focus dramatically.',
+      links: [
+        { label: 'Importance of sleep', url: 'https://www.youtube.com/watch?v=5MuIMqhT8DM' },
+        { label: 'Sleeping better when anxious', url: 'https://www.youtube.com/watch?v=wkGWwyrCoRs' },
+      ]
+    },
+    5: {
+      icon: '🌬️', title: 'Breathe Intentionally',
+      body: 'Shortness of breath during stress is your nervous system firing. 4-7-8 breathing (in 4, hold 7, out 8) resets it fast.',
+      links: [
+        { label: 'Breathing techniques', url: 'https://www.youtube.com/watch?v=odADwWzHR24' },
+        { label: 'Breathing techniques to calm down in real time', url: 'https://www.youtube.com/watch?v=g-nZBmxLBOo' },
+        { label: 'More breathing techniques', url: 'https://www.youtube.com/watch?v=AeMckI_nfP4' },
+      ]
+    },
+    6: {
+      icon: '🎧', title: 'Protect Your Study Zone',
+      body: 'Noise-cancelling headphones or white noise apps can turn a chaotic space into a workable one instantly.',
+      links: [
+        { label: 'How sounds make you anxious', url: 'https://www.youtube.com/watch?v=uaGAcmwoVzQ' },
+      ]
+    },
+    7: {
+      icon: '🏠', title: 'Create Small Pockets of Stability',
+      body: 'If home is unpredictable, anchor your day with one consistent routine — same wake time, same first task.',
+      links: [
+        { label: 'Creating safe spaces at work', url: 'https://www.youtube.com/watch?v=MKywWRW_6Uc' },
+        { label: 'Importance of creating a safe home space', url: 'https://www.youtube.com/watch?v=7x4qzd9OHe8' },
+      ]
+    },
+    8: {
+      icon: '🛡️', title: 'Safety Comes First',
+      body: "If you don't feel safe physically or emotionally, speak to someone you trust immediately — a coach, teacher, or family member.",
+      links: [
+        { label: 'Creating your own emotional safety', url: 'https://www.youtube.com/watch?v=GJ0Sh1ImVo0' },
+        { label: 'Explaining safety behaviours & why we drop them', url: 'https://www.youtube.com/watch?v=J5SAMMQVQe0&t=29s' },
+        { label: 'Importance of mental and physical safety', url: 'https://www.youtube.com/watch?v=bkWUtUBf54g' },
+        { label: 'Protection of physical safety', url: 'https://www.youtube.com/watch?v=LStU2G4JBus' },
+      ]
+    },
+    9: {
+      icon: '🍎', title: 'Food Is Fuel',
+      body: "Skipping meals tanks both athletic and academic performance. Tell your coach if food access is a barrier — it's their job to help.",
+      links: []
+    },
+    10: {
+      icon: '📊', title: 'Redefine Academic Success',
+      body: 'Track your effort and improvement — not just grades. Progress is data. Grades are one snapshot.',
+      links: [
+        { label: 'Coping with academic stress', url: 'https://www.youtube.com/watch?v=cdTrL9akJ7E' },
+        { label: 'The neuropsychology of performance under pressure', url: 'https://www.youtube.com/watch?v=cPxyGeagKwg&t=228s' },
+      ]
+    },
+    11: {
+      icon: '📅', title: 'Time-Block Your Week',
+      body: 'Map training, school, and rest on a visual schedule. Seeing the week whole reveals what can be cut or shifted.',
+      links: [
+        { label: 'Tips to manage workload as a student', url: 'https://www.youtube.com/watch?v=26NPmNg-uJU' },
+        { label: 'Time management tips', url: 'https://www.youtube.com/watch?v=He0XiDnAH_Y' },
+      ]
+    },
+    12: {
+      icon: '🤝', title: 'Find Your Ally',
+      body: 'Identify one teacher who gets you — or who could. A single supportive relationship inside school changes the whole experience.',
+      links: [
+        { label: 'Strengthening student-teacher relationships', url: 'https://www.youtube.com/watch?v=-awY8foa6KQ' },
+        { label: 'Building positive student-teacher relationships', url: 'https://www.youtube.com/watch?v=tczArcPh5i8' },
+      ]
+    },
+    13: {
+      icon: '🧭', title: 'Narrow Your Focus',
+      body: "You don't need a 10-year plan. Identify one thing you're curious about and explore it seriously this term.",
+      links: [
+        { label: 'Psychology on career choices', url: 'https://www.youtube.com/watch?v=4e6KSaCxcHs' },
+        { label: 'How to stop worrying about the future', url: 'https://www.youtube.com/watch?v=u79XABa_mHk' },
+      ]
+    },
+    14: {
+      icon: '💬', title: 'Activate Your Support Network',
+      body: 'Support only works if you use it. Text one person this week — not to vent, just to connect.',
+      links: [
+        { label: 'Importance of connection and belonging', url: 'https://www.youtube.com/watch?v=kl6m6RLnXmU' },
+        { label: 'Developing good social support systems', url: 'https://www.youtube.com/watch?v=e1jtVFc_l1U' },
+        { label: 'Building support systems for better mental health', url: 'https://www.youtube.com/watch?v=AbKGeH5g1rI' },
+      ]
+    },
+    15: {
+      icon: '⚡', title: 'Know Your Own Standard',
+      body: 'Peer pressure shrinks when your own standard is clear. Write down what you actually value in sport and school.',
+      links: [
+        { label: 'Dealing with peer pressure (podcast)', url: 'https://www.youtube.com/watch?v=qqM5OBYiZf8&t=66s' },
+        { label: 'Dealing with peer pressure', url: 'https://www.youtube.com/watch?v=ai0KXitR6lw' },
+      ]
+    },
+    16: {
+      icon: '✂️', title: 'Audit Your Commitments',
+      body: 'List every activity you do weekly. Pick the one giving you the least energy. Consider dropping or reducing it.',
+      links: [
+        { label: 'Balancing sport and study (Waterloo student)', url: 'https://www.youtube.com/watch?v=14FoAhmq2Es' },
+        { label: 'How to balance extracurriculars with studying', url: 'https://www.youtube.com/watch?v=rHJQUuFDJl0' },
+      ]
+    },
+    17: {
+      icon: '🚨', title: 'Bullying Is Not Part of the Game',
+      body: "If you're being bullied or harassed, report it to a trusted adult. It doesn't get better on its own, and you don't have to handle it alone.",
+      links: [
+        { label: 'Stopping bullying', url: 'https://www.youtube.com/watch?v=iFlrCuSyhvU' },
+        { label: 'Techniques to deal with bullying', url: 'https://www.youtube.com/watch?v=vrteTHeHecY' },
+        { label: 'The science of bullying (podcast)', url: 'https://www.youtube.com/watch?v=RE4n29uEldA' },
+        { label: 'Anti-bullying', url: 'https://www.youtube.com/watch?v=-i2SHPL5YYo' },
+      ]
+    },
+  };
+
+  const used = new Set();
+  const result = [];
+  for (const idx of topCatIndices) {
+    if (allTips[idx] !== undefined && !used.has(idx)) {
+      result.push(allTips[idx]);
+      used.add(idx);
+    }
+    if (result.length === 4) break;
+  }
+  for (const i of [4, 0, 11, 14].filter(i => !used.has(i))) {
+    if (result.length >= 4) break;
+    result.push(allTips[i]);
+  }
+  return result.slice(0, 4);
+}
+
+function resetAssessment() {
+  answers = {}; currentSection = 0; showScreen('intro-screen');
+}
+
+function hexToRgb(hex) {
+  return `${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)}`;
+}
+</script>
+</body>
+</html>
